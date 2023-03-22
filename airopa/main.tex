@@ -23,7 +23,7 @@
 
 \renewcommand{\arraystretch}{1.3}
 
-\title{Point Spread Function Reconstruction for the OSIRIS Imager}
+\title{Point Spread Function Reconstruction on the OSIRIS Imager}
 
 \author[a,*]{Sean K. Terry}
 \author[a]{Jessica R. Lu}
@@ -41,7 +41,7 @@
 \maketitle
 
 \begin{abstract}
-The Keck All-sky Precision Adaptive Optics (KAPA) project will deliver significant upgrades to the Keck-I adaptive optics (AO) system. In addition to hardware upgrades, a suite of software is also being developed for the next-generation AO system. In this study we present the characterization of instrumental phase aberrations across the OSIRIS imager field of view, as well as phase diversity measurements made on an artificial fiber source to determine the variability of aberrations across the field. We develop a novel version of the AIROPA PSF-R software package to analyze galactic center (GC) images taken with the OSIRIS imager in 2020. We compare astrometric and photometric precision between the OSIRIS results and previous Keck-II/NIRC2 results using AIROPA.
+The Keck All-sky Precision Adaptive Optics (KAPA) project will deliver significant upgrades to the Keck-I adaptive optics (AO) system. In addition to hardware upgrades, a suite of PSF-reconstruction software is also being developed for the next-generation AO system. In this study we aim to model PSF variations for the OSIRIS imager using knowledge from instrumental aberration calibrations and atmospheric turbulence modeling. We use phase diversity measurements obtained with a calibration fiber source to characterize the instrumental aberrations across the OSIRIS field of view, and report its variation over time. We find the wavefront error varies by XX nm on a daily basis, however the differential aberrations across the field of view vary by less than YY nm, implying that off-axis instrumental aberrations need only be measured between openings (e.g. hardware upgrades) of the OSIRIS instrument. Finally, we develop a novel version of the AIROPA PSF-R software package to analyze simulated images and on-sky galactic center (GC) images taken with the OSIRIS imager. We compare astrometric and photometric precision between the single-PSF and variable-PSF modes in AIROPA, finding that on average the precision is YYY.
 \end{abstract}
 
 % Include a list of keywords after the abstract 
@@ -50,9 +50,12 @@ The Keck All-sky Precision Adaptive Optics (KAPA) project will deliver significa
 {\noindent\footnotesize\textbf{*} \href{mailto:sean.terry@berkeley.edu}{sean.terry@berkeley.edu}}
 
 \section{Introduction} \label{sec:intro}
-With the next generation of adaptive optics (AO) instruments coming online soon, it is becoming increasingly important to properly characterize the spatial and temporal dependence of the point spread function (PSF) for data obtained with AO. The Keck-I and Keck-II AO systems have been used to deliver very high-resolution imaging for well over two decades, and have been continuously upgraded and fitted with newer generation hardware. The future of both Keck telescopes is filled with several promising next-generation updates \cite{wizinowich:2020a, bond:2020a}.
-\\
-\indent As a result of imperfect knowledge of the spatially varying (i.e. off-axis) PSF in these AO systems, very precise astrometry and photometry for a large majority of stellar sources in crowded fields (for example) has been limited. The Anisoplanatic and Instrumental Reconstruction of Off-axis PSFs for AO (AIROPA) is a suite of software packages that utilizes phase-diversity measurements, atmospheric profile data, and wave propagation through both turbulence and optical systems. With this knowledge, AIROPA generates a model of the field-dependent PSF for both natural guide star (NGS) and laser guide star (LGS) modes. The software functions under the assumption that every PSF that is extracted consists of a convolution of the on-axis PSF, the instrumental aberration, and the atmospheric anisoplanatism \cite{do:2018a}. Further descriptions of AIROPA and the sub-modules that it is built upon are given in \cite{witzel:2016a}.
+Large ground-based observatories the utilize adaptive optics (AO) have been delivering diffraction-limited imaging at infrared wavelengths for several decades now. While high-resolution imaging using AO has enabled revolutionary science results (stars orbiting Sgr A$^*$, directly imaged exoplanets, strong gravitational lensing, etc), some limitations have persisted. These are largely related to the anisoplanatic effect as observed on single-conjugate AO systems. With a single laser guide star (LGS), the AO correction degrades, sometimes rapidly, as the distance from the LGS increases. This ultimately causes the point spread function (PSF) to vary with both time and position in the field of view, which can be difficult to accurately characterize.\\
+\indent The Anisoplanatic and Instrumental Reconstruction of Off-axis PSFs for AO (AIROPA) is a suite of software packages that utilizes phase-diversity measurements, atmospheric profile data, and wave propagation through both turbulence and optical systems. With this knowledge, AIROPA generates a model of the field-dependent PSF for both natural guide star (NGS) and laser guide star (LGS) modes. The software functions under the assumption that every PSF that is extracted consists of a convolution of the on-axis PSF, the instrumental aberration, and the atmospheric anisoplanatism \cite{do:2018a}.\\
+\indent While there are several promising ongoing programs to upgrade the AO systems on both Keck telescopes \cite{wizinowich:2020a, bond:2020a}, modeling and understanding the time-dependent and spatial variability of the PSF remains an important task for next-generation AO systems. This study supports the development of PSF-R techniques to be used for the new Keck All-sky Precision Adaptive Optics (KAPA) system onboard Keck-I/OSIRIS, which is scheduled to see first light in 2024.
+
+AIROPA is originally presented in \cite{witzel:2016a}, and several recent studies have shown its ability to reconstruct the spatially varying PSF in bench tests, simulations, and real on-sky science data \citep{Ciurlo:inprep, turri:2022}.
+\vspace{1cm}
 \\
 \indent For context we give a brief description of the input data needed for AIROPA. Described as the convolution of the on-axis PSF with an instrumental and atmospheric component to characterize its spatial variability:
 
@@ -80,37 +83,58 @@ For a schematic on the variable-PSF algorithm in AIROPA, we refer to Figure 1 in
 \indent This paper is organized as follows: In \textbf{Section 2, we characterize the instrumental aberrations on the OSIRIS detector. Section 3 describes the analysis of on-sky OSIRIS data for the GC and comparisons to previous on-sky NIRC2 results for the GC. In Section 4, we analyze the effectiveness of AIROPA to reconstruct the spatially variable PSF for OSIRIS and compare the results to the static PSF mode. Finally, we give a discussion and conclude the paper in Section 5}.
 
 \section{Phase Diversity}\label{sec:phase-diversity}
-Phase diversity measurements are taken during afternoon calibrations on the AO bench. The purpose of these measurements is to obtain information about the field-dependent instrumental aberrations on the detector. A bright fiber source is positioned at different locations across the field and is moved in and out of focus as part of the data acquisition. Further details about these calibration procedures are given in \cite{Ciurlo:inprep}. \\
-\indent We then retrieve the wavefront phase from the intensity maps of the in-focus point-like sources using the Gerchberg-Saxton algorithm \cite{gerchberg:1972a}. Figure ZZZ shows the central and corner phase maps for the OSIRIS detector. We note that the phase maps for OSIRIS are lower resolution than that of the NIRC2 phase maps, as the instrumental aberrations across the OSIRIS field are lower-order than NIRC2. Figure \ref{fig:phase-map-grid} shows the $5\times5$ grid of phase maps, with the central phase map subtracted from each. There is an obvious and significant tilt in the current phase diversity retrieval which needs to be fixed.
+Phase diversity measurements are taken during afternoon calibrations on both NIRC2 and OSIRIS AO benches. First, a fiber source that is mounted on a stage at the entrance to the AO system is centered at the OSIRIS pointing origin (i.e. approximately at the center of the detector). The fiber is imaged while it is in-focus and additionally at three subsequent out-of-focus levels ($+$5mm, $-$5mm, and $-$10mm). The purpose of these daily measurements is to obtain information about the instrumental aberrations within the AO system, and to make corrections to the DM and other components in order to optimize the system stability for subsequent nightly observing. This process is sometimes referred to as `image sharpening'. For OSIRIS, we use the following setup: \texttt{instrument-imager}, \texttt{BrGamma} filter ($\lambda_c = 1.686 \mu$m), and \texttt{open-pupil}.\\
+\indent There are some limitations from the fiber for these calibrations, namely that the fiber illumination is not perfectly uniform and slightly varies between exposures. We implement schemes that were previously developed for NIRC2 phase diversity as described in \cite{Ciurlo:inprep} to mitigate some of these issues and produce well-behaved fiber images. Particularly, we use various neutral density filters in front of the fiber source to dim or enhance the light, since the luminosity of the fiber has measurable variation and its light is spread over a larger number of pixels for the more out-of-focus positions. Further, the integration times are modified for the different focus levels to optimize signal-to-noise and avoid saturation. The target signal-to-noise ratio we achieve for the fiber image at each focus level is 20. This process is repeated at each position across the detector to characterize the filed-dependent instrumental aberrations. Finally, we take background images with the fiber turned off and flat field images for calibration purposes. \\
+\indent Figure XXXYYY shows an example of the in-focus and out-of-focus fiber images from the 2020 data. The top row shows the fiber images at the central detector position, while the bottom row shows the fiber images near the lower-left corner detector position. The phase diversity observations presented in this work were taken in 2020 and 2021 and are presented in Table 1. It is worth noting that OSIRIS was opened several times between the 2020 and 2021 observations (central phasemap significantly different between years).
+
+\begin{table}[!h]
+\centering
+\caption{Phase diversity data obtained for instrumental aberrations on OSIRIS.}
+\begin{center}
+\begin{tabular}{lccccc}
+\hline
+        Date [UT] &  N Pos &  WFE$_{\textrm{Cen}}$ [nm] &  WFE$_{\textrm{Lower-left}}$ [nm] & WFE$_{\textrm{Cen}-\textrm{LL}}$ [nm] \\\hline\hline
+        2020 Aug 21 & 25 & NNN & OOO & aaa\\
+        2021 Oct 06 & 81 & MMM & PPP & bbb\\\hline
+\end{tabular}
+\end{center}
+{\raggedright \footnotesize{\textbf{Note}. N Pos gives the total number of positions observed, the wavefront error at the center (\textit{Cen}), lower-left corner (\textit{Lower-left}), and the difference between the center and lower-left (\textit{Cen}$-$\textit{LL}).}\par}
+\label{tab:fields-metrics}
+\end{table}
 
 \begin{figure}[!h]
+ \hspace{1cm}
  \makebox[\textwidth][c]{
- \includegraphics[width=0.8\textwidth]{airopa/Figures/osiris_pcu_grid_fullframe.pdf}
+ \includegraphics[width=1.1\textwidth]{airopa/Figures/osiris_cencorn_grid.pdf}
  }
- \caption{\footnotesize Full-frame image of the OSIRIS pinhole calibration unit (PCU) in focus taken in January 2023. Light from each pinhole travels through the AO system optics and OSIRIS instrument. \label{fig:pcu_grid_full}}
+ \caption{\footnotesize Center and corner phase maps for the OSIRIS detector taken in 2020. Both phase maps are on the same color scale (in nm). \label{fig:phase-map-cencorn}}
 \end{figure}
 
 \begin{figure}[!h]
+ \hspace{5mm}
  \makebox[\textwidth][c]{
- \hspace{-10mm}
- \includegraphics[width=1.2\textwidth]{airopa/Figures/osiris_pcu_grid_corners.pdf}
+ \includegraphics[width=1.4\textwidth]{airopa/Figures/osiris_phasemap_grid_compare.pdf}
  }
- \vspace{-20mm}
- \caption{\footnotesize Zoomed-in view of individual pinholes shown in the four corners of Figure \ref{fig:pcu_grid_full}. The PSFs on the left-side of the field show clear elongation, while the right-side PSFs show less elongation. The color scale is the same as Figure \ref{fig:pcu_grid_full}. \label{fig:pcu_grid_corners}}
-\end{figure}
-
-\begin{figure}[!h]
- \makebox[\textwidth][c]{
- \includegraphics[width=0.9\textwidth]{airopa/Figures/osiris_phasemap_grid.pdf}
- }
- \caption{\footnotesize Center-subtracted phase map grid for the OSIRIS detector, obtained in 2020. \label{fig:phase-map-grid}}
+ \caption{\footnotesize Center-subtracted phase map grid for the OSIRIS detector from data obtained in 2020 (\textit{left}) and 2021 (\textit{right}). \label{fig:phase-map-grid}}
 \end{figure}
 
 \subsection{Phase Map Retrieval} \label{subsec:phase-map-retrieval}
-Describe retrieving the phase maps from the phase diversity data (Gerchberg-Saxton, etc).
+\indent The daily image sharpening procedure is only performed at the central position on the detector. In order to characterize the phase aberrations as a function of detector position, we iteratively move the fiber to positions along a grid on the detector and take subsequent in-focus and out-of-focus images (see left panel of Figure \ref{fig:grid_stars} for a reference). retrieve the wavefront phase from the intensity maps of the in and out-of-focus fiber sources using the Gerchberg-Saxton algorithm \cite{gerchberg:1972a}. Figure ZZZ shows the central and lower-left corner phase maps for the OSIRIS detector with data from 2020-08-21. The central phase map is smoother compared to the corner map, and has a smaller RMS variation of ${\sim}100$nm compared to the corner phase map with an RMS variation of  Figure \ref{fig:phase-map-grid} shows a $5\times5$ grid of phase maps from 2020 as well as a $9\times9$ grid from 2021, with the central phase map subtracted from each.
 
 \section{Simulations} \label{sec:simulations}
 We use AIROPA single-PSF and variable-PSF mode to analyze a grid of pinholes from the newly installed pinhole calibration unit (PCU). Figure ZZ shows the uniform grid of pinholes, the next figure will show the residual image created with the single-PSF mode alongside the residual image created with the variable-PSF.
+
+\begin{figure}[!h]
+ \makebox[\textwidth][c]{
+ \includegraphics[width=1.3\textwidth]{airopa/Figures/osiris_star_grid.pdf}
+ }
+ \caption{\footnotesize Simulated grid of stars on the OSIRIS imager (\textit{left}), residual image from the single-PSF mode (\textit{middle}) and variable-PSF mode (\textit{right}). \label{fig:grid_stars}}
+\end{figure}
+
+\begin{figure}[!h]
+  \subfloat{\includegraphics[width=0.9\textwidth]{airopa/Figures/synthetic_gc_osiris.pdf}}
+  \caption{\footnotesize \textit{Left}: On-sky OSIRIS image of the GC, with a dashed yellow outline representing the NIRC2 field of view. \textit{Right}: Full-frame NIRC2 image of the central ${\sim}10$ arcseconds around the GC.} \label{fig:gc_osiris_nirc2}
+\end{figure}
 
 \section{On-sky Observations}\label{sec:on-sky-obs}
 The datasets presented in this work were acquired with the Keck-II/OSIRIS imager in the laser guide star adaptive optics (LGSAO) mode. The data were taken with the K$_{\textrm{p}}$ filter ($\lambda_{c} = 2.12\mu$m), the pixel scale for the OSIRIS imager is 9.952 mas/pix, and all of the data (including phase diversity) were taken in 2020. Figure BBB shows an individual cleaned frame from our galactic center (GC) observations with OSIRIS.
@@ -118,7 +142,7 @@ The datasets presented in this work were acquired with the Keck-II/OSIRIS imager
 \begin{figure}[!h]
   \hspace{-20mm}
   \subfloat{\includegraphics[width=1.2\textwidth]{airopa/Figures/gc_osiris_nirc2_image.pdf}}
-  \caption{\footnotesize \textit{Left}: Full-frame OSIRIS image of the GC, with a dashed yellow outline representing the NIRC2 field of view. \textit{Right}: Full-frame NIRC2 image of the central ${\sim}10$ arcseconds around the GC.} \label{fig:gc_osiris_nirc2}
+  \caption{\footnotesize \textit{Left}: On-sky OSIRIS image of the GC, with a dashed yellow outline representing the NIRC2 field of view. \textit{Right}: Full-frame NIRC2 image of the central ${\sim}10$ arcseconds around the GC.} \label{fig:gc_osiris_nirc2}
 \end{figure}
 
 % References
